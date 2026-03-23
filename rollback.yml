@@ -1,0 +1,30 @@
+- name: Rollback frontend
+  hosts: web
+  become: yes
+
+  vars:
+    backup_file: "/opt/backups/site-1774255344.zip"
+    web_root: "/var/www/html"
+
+  tasks:
+
+    - name: Remove current version
+      file:
+        path: "{{ web_root }}"
+        state: absent
+
+    - name: Recreate directory
+      file:
+        path: "{{ web_root }}"
+        state: directory
+
+    - name: Restore backup
+      unarchive:
+        src: "{{ backup_file }}"
+        dest: "{{ web_root }}"
+        remote_src: yes
+
+    - name: Restart nginx
+      service:
+        name: nginx
+        state: restarted

@@ -1,0 +1,44 @@
+- name: Deploy frontend locally with version control
+  hosts: web
+  become: yes
+
+  vars:
+    web_root: /var/www/html
+    backup_dir: /opt/backups
+
+  tasks:
+
+    - name: Install nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+
+    - name: Ensure backup directory exists
+      file:
+        path: "{{ backup_dir }}"
+        state: directory
+
+    # 🔥 Backup old version
+    - name: Backup current HTML
+      archive:
+        path: "{{ web_root }}"
+        dest: "{{ backup_dir }}/site-{{ ansible_date_time.epoch }}.zip"
+      ignore_errors: yes
+
+    # 🚀 Deploy new version
+    - name: Copy new HTML
+      copy:
+        src: files/index.html
+        dest: "{{ web_root }}/index.html"
+
+    - name: Start nginx
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: Restart nginx
+      service:
+        name: nginx
+        state: restarted
