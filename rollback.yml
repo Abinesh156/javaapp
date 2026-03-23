@@ -3,8 +3,8 @@
   become: yes
 
   vars:
-    backup_file: "/opt/backups/site-1774255344.zip"
-    web_root: "/var/www/html"
+    backup_file: "/opt/backups/site-1774258327.zip"
+    web_root: "/var/www/"
 
   tasks:
 
